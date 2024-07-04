@@ -11,7 +11,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
-import java.net.http.HttpClient;
 import java.util.*;
 
 @Service
@@ -19,7 +18,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     private final JsonConverter jsonConverter;
     private final InputValidationService inputValidationService;
     private final HttpOperationsService httpOperationsService;
-    private final HttpClient httpClient;
     private final HttpRequestFactory httpRequestFactory;
     private final CandidateValidator candidateValidator;
 
@@ -29,10 +27,6 @@ public class RegistrationServiceImpl implements RegistrationService {
                                    HttpOperationsService httpOperationsService,
                                    HttpRequestFactory httpRequestFactory,
                                    CandidateValidator candidateValidator) {
-        httpClient = HttpClient.newBuilder()
-                .followRedirects(HttpClient.Redirect.ALWAYS)
-                .build();
-
         this.jsonConverter = jsonConverter;
         this.inputValidationService = inputValidationService;
         this.httpOperationsService = httpOperationsService;
@@ -57,7 +51,7 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private List<String> getRoles() throws IOException, InterruptedException, InvalidReturnCodeException {
-        return httpOperationsService.getRoles(httpClient, httpRequestFactory);
+        return httpOperationsService.getRoles(httpRequestFactory);
     }
 
     private String createCandidate(Candidate candidate) throws IOException, InterruptedException, InvalidReturnCodeException {
@@ -83,11 +77,11 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void signUpCandidate(String candidateJson) throws IOException, InterruptedException, InvalidReturnCodeException {
-        httpOperationsService.signUpCandidate(httpClient, httpRequestFactory, candidateJson);
+        httpOperationsService.signUpCandidate(httpRequestFactory, candidateJson);
     }
 
     private String getCode(Candidate candidate) throws IOException, InterruptedException, InvalidReturnCodeException {
-        return httpOperationsService.getCode(httpClient, httpRequestFactory, candidate.getEmail());
+        return httpOperationsService.getCode(httpRequestFactory, candidate.getEmail());
     }
 
     private String createToken(String email, String generatedCode) {
@@ -99,6 +93,6 @@ public class RegistrationServiceImpl implements RegistrationService {
     }
 
     private void setStatus(String statusJson) throws IOException, InterruptedException, InvalidReturnCodeException {
-        httpOperationsService.setStatus(httpClient, httpRequestFactory, statusJson);
+        httpOperationsService.setStatus(httpRequestFactory, statusJson);
     }
 }
